@@ -31,10 +31,6 @@ public class Scanner {
     return tokens;
   }
 
-  private boolean isAtEnd() {
-    return current >= source.length();
-  }
-
   private void scanToken() {
     char c = advance();
     switch (c) {
@@ -102,6 +98,10 @@ public class Scanner {
         Lox.error(line, "Unexpected character.");
         break;
     }
+  }
+
+  private boolean isAtEnd() {
+    return current >= source.length();
   }
 
   private boolean match(char expected) {
