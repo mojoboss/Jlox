@@ -98,7 +98,11 @@ public class Scanner {
         string();
         break;
       default:
-        Lox.error(line, "Unexpected character.");
+        if (isDigit(c)) {
+          number();
+        } else {
+          Lox.error(line, "Unexpected character.");
+        }
         break;
     }
   }
@@ -126,6 +130,11 @@ public class Scanner {
     return source.charAt(current);
   }
 
+  private char peekNext() {
+    if (current + 1 >= source.length()) return '\0';
+    return source.charAt(current + 1);
+  }
+
   private void addToken(TokenType type) {
     addToken(type, null);
   }
@@ -133,6 +142,19 @@ public class Scanner {
   private void addToken(TokenType type, Object literal) {
     String text = source.substring(start, current);
     tokens.add(new Token(type, text, literal, line));
+  }
+
+  private void number() {
+    while (isDigit(peek())) {
+      advance();
+    }
+    // Look for a fractional part.
+    if (peek() == '.' && isDigit(peekNext())) {
+      // Consume the "."
+      advance();
+      while (isDigit(peek())) advance();
+    }
+    addToken(NUMBER, Double.parseDouble(source.substring(start, current)));
   }
 
   private void string() {
@@ -149,6 +171,10 @@ public class Scanner {
     // Trim the surrounding quotes.
     String value = source.substring(start + 1, current - 1);
     addToken(STRING, value);
+  }
+
+  private boolean isDigit(char c) {
+    return c >= '0' && c <= '9';
   }
 }
 
